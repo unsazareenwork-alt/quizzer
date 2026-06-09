@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Quiz Master</title>
+  <style>
+    body { background: #0f172a; color: #f8fafc; font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+    .container { width: 90%; max-width: 600px; background: #1e293b; padding: 30px; border-radius: 12px; }
+    .btn { background: #2563eb; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 6px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Quiz Master</h1>
+    <input type="file" id="pdfFile" accept=".pdf" style="margin-bottom:20px; display:block;">
+    <button id="generateBtn" class="btn">Generate Live Test</button>
+    <div id="quiz-workspace" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+      const fileInput = document.getElementById('pdfFile').files[0];
+      const workspace = document.getElementById('quiz-workspace');
+      
+      if (!fileInput) return alert("Please select a PDF file.");
+      
+      workspace.innerHTML = "Processing document...";
+
+      // Use FormData to send the file securely without Base64 errors
+      const formData = new FormData();
+      formData.append('pdf', fileInput);
+
+      try {
+        const res = await fetch('/api/process-and-quiz', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          workspace.innerHTML = "<h3>Quiz Generated!</h3>" + JSON.stringify(data.questions);
+        } else {
+          workspace.innerHTML = "Error: " + data.message;
+        }
+      } catch (err) {
+        workspace.innerHTML = "Server connection error.";
+      }
+    });
+  </script>
+</body>
+</html>
