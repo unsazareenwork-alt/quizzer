@@ -1,6 +1,0 @@
-allowBuilds:
-  '@google/genai': true
-  canvas: set this to true or false
-  protobufjs: true
-  sharp: true
-  tesseract.js: set this to true or false
