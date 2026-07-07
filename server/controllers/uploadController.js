@@ -3,26 +3,40 @@ const { generateQuiz } = require("../services/groqService");
 
 const uploadTxt = async (req, res) => {
   try {
-    console.log("FILE:", req.file);
-    console.log("BODY:", req.body);
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file uploaded",
+      });
+    }
 
     const filePath = req.file.path;
 
     const textContent = fs.readFileSync(filePath, "utf8");
 
+    if (!textContent.trim()) {
+      return res.status(400).json({
+        message: "Uploaded file is empty.",
+      });
+    }
+
     const questions = await generateQuiz(textContent);
 
+    fs.unlinkSync(filePath);
+
     res.status(200).json({
-      message: "Quiz generated successfully",
+      success: true,
       questions,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
 
     res.status(500).json({
-      message: "Error generating quiz",
+      success: false,
+      message: err.message,
     });
   }
 };
 
-module.exports = { uploadTxt };
+module.exports = {
+  uploadTxt,
+};

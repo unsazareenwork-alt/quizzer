@@ -5,84 +5,79 @@ const groq = new Groq({
 });
 
 async function generateQuiz(text) {
-  const response = await groq.chat.completions.create({
-    model: "openai/gpt-oss-120b",
-    messages: [
-      {
-        role: "user",
-        content: `
-You are a JSON API.
+  try {
+    const response = await groq.chat.completions.create({
+      model: "openai/gpt-oss-120b",
 
-Generate exactly 5 multiple-choice questions from the text.
+      temperature: 0.3,
 
-Return ONLY a JSON array.
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a quiz generator. Return ONLY valid JSON. No markdown. No explanations outside JSON.",
+        },
 
-Do not include explanations.
-Do not include reasoning.
-Do not include thinking.
-Do not include markdown.
-Do not include code blocks.
+        {
+          role: "user",
+          content: `
+Generate exactly 5 multiple-choice questions from the following notes.
 
-Format:
+Return ONLY ONE valid JSON array.
+
+Example:
+
 [
   {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correctAnswer": "...",
-    "explanation": "..."
-  }
-]
-  [
-  {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correctAnswer": "...",
-    "explanation": "..."
-  }
-]
-  [
-  {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correctAnswer": "...",
-    "explanation": "..."
-  }
-]
-  Include a short explanation for each answer.
-
-Text:
-${text}
-        `,
-      },
+    "question":"Question here",
+    "options":[
+      "Option A",
+      "Option B",
+      "Option C",
+      "Option D"
     ],
-    temperature: 0.3,
-  });
-
-  const content = response.choices[0].message.content;
-
-  console.log("RAW RESPONSE:");
-  console.log(content);
-
-  // Find JSON array in response
-  const firstBracket = content.indexOf("[");
-  const lastBracket = content.lastIndexOf("]");
-
-  if (firstBracket === -1 || lastBracket === -1) {
-    throw new Error("No JSON array found in AI response");
+    "correctAnswer":"Option A",
+    "explanation":"Short explanation."
   }
+]
 
-  const jsonString = content.slice(
-    firstBracket,
-    lastBracket + 1
-  );
+Notes:
 
-  try {
-    return JSON.parse(jsonString);
+${text}
+`,
+        },
+      ],
+    });
+
+    const content = response.choices[0].message.content;
+
+    console.log("\n================ RAW AI RESPONSE ================\n");
+    console.log(content);
+    console.log("\n===============================================\n");
+
+    // Try direct JSON first
+    try {
+      return JSON.parse(content);
+    } catch (err) {
+      console.log("Direct parse failed...");
+
+      // Extract first JSON array
+      const match = content.match(/\[[\s\S]*\]/);
+
+      if (!match) {
+        throw new Error("No JSON array found in AI response.");
+      }
+
+      return JSON.parse(match[0]);
+    }
   } catch (err) {
-    console.error("JSON Parse Error:");
-    console.error(jsonString);
+    console.error("Groq Error:");
+    console.error(err);
+
     throw err;
   }
 }
 
-module.exports = { generateQuiz };
+module.exports = {
+  generateQuiz,
+};
