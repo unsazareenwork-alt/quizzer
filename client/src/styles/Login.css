@@ -1,0 +1,329 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:"Space Grotesk",sans-serif;
+    background:#E8E1FF;
+}
+
+/* ================= PAGE ================= */
+
+.login-page{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:50px;
+}
+
+/* ================= MAIN CARD ================= */
+
+.login-container{
+    width:1100px;
+    min-height:650px;
+
+    display:grid;
+    grid-template-columns:46% 54%;
+
+    border:4px solid #1B1824;
+    box-shadow:8px 8px 0 #1B1824;
+
+    overflow:hidden;
+}
+
+/* ================= LEFT ================= */
+
+.left-panel{
+
+    background:#17131F;
+    color:white;
+
+    padding:45px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:60px;
+}
+
+.brand img{
+    width:90px;
+    height:90px;
+    image-rendering:pixelated;
+}
+
+.brand h2{
+    font-family:"VT323", monospace;
+    font-size:40px;
+    letter-spacing:4px;
+    font-weight:400;
+}
+
+.brand span{
+    color:#6F2DFF;
+}
+
+.left-panel h1{
+
+    font-family:"VT323";
+    font-size:62px;
+    line-height:1;
+    letter-spacing:2px;
+
+    margin-bottom:28px;
+}
+
+.left-panel p{
+
+    font-size:18px;
+    color:#CFCBD8;
+    line-height:1.7;
+
+    margin-bottom:auto;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+
+    display:flex;
+    gap:18px;
+
+    margin-top:45px;
+}
+
+.stat-card{
+
+    flex:1;
+
+    background:#FFFDF4;
+
+    padding:18px;
+
+    border:3px solid #1B1824;
+}
+
+.stat-title{
+
+    color:#8C839B;
+    font-size:13px;
+    margin-bottom:12px;
+}
+
+.stat-card h3{
+
+    color:#222;
+
+    font-size:48px;
+    font-weight:500;
+}
+
+.stat-card span{
+
+    color:#FF8B2A;
+    font-size:30px;
+}
+
+/* ================= RIGHT ================= */
+
+.right-panel{
+
+    background:#FFFDF4;
+
+    padding:40px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* ================= TABS ================= */
+
+.tabs{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+
+    gap:0;
+
+    margin-bottom:32px;
+}
+
+.tabs a{
+    text-decoration:none;
+}
+
+.tabs button{
+
+    width:100%;
+    height:56px;
+
+    border:3px solid #1B1824;
+
+    background:#ECE6FF;
+
+    font-family:"VT323";
+    font-size:28px;
+
+    cursor:pointer;
+}
+
+.tabs .active{
+
+    background:linear-gradient(90deg,#6325FF,#8D48FF);
+
+    color:white;
+}
+
+/* ================= FORM ================= */
+
+form{
+
+    display:flex;
+    flex-direction:column;
+}
+
+label{
+
+    font-size:13px;
+
+    color:#8D859C;
+
+    margin-bottom:8px;
+    margin-top:18px;
+
+    letter-spacing:2px;
+}
+
+.input-box{
+
+    display:flex;
+    align-items:center;
+
+    height:72px;
+
+    border:3px solid #1B1824;
+
+    background:#FFFDF4;
+
+    padding:0 18px;
+
+    margin-bottom:12px;
+}
+
+.input-box svg{
+
+    font-size:24px;
+
+    color:#8C839B;
+
+    margin-right:14px;
+}
+
+.input-box input{
+
+    flex:1;
+
+    border:none;
+    outline:none;
+
+    background:none;
+
+    font-size:20px;
+
+    font-family:"Space Grotesk";
+}
+
+.input-box input::placeholder{
+
+    color:#999;
+}
+
+/* ================= BUTTON ================= */
+
+.login-btn{
+
+    margin-top:25px;
+
+    height:72px;
+
+    border:3px solid #1B1824;
+
+    background:linear-gradient(90deg,#6325FF,#8D48FF);
+
+    color:white;
+
+    font-family:"VT323";
+    font-size:34px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:12px;
+
+    cursor:pointer;
+
+    box-shadow:7px 7px 0 #6F2FFF;
+
+    transition:.2s;
+}
+
+.login-btn:hover{
+
+    transform:translateY(-3px);
+}
+
+/* ================= FOOTER ================= */
+
+.bottom-text{
+
+    margin-top:30px;
+
+    text-align:center;
+
+    color:#888;
+
+    font-size:18px;
+}
+
+.bottom-text a{
+
+    margin-left:6px;
+
+    color:#6325FF;
+
+    font-weight:bold;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:950px){
+
+.login-container{
+
+    width:95%;
+
+    grid-template-columns:1fr;
+}
+
+.left-panel{
+
+    display:none;
+}
+
+.right-panel{
+
+    padding:30px;
+}
+
+}
