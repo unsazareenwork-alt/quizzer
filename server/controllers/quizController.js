@@ -1,84 +1,77 @@
-const db = require("../config/db");
+const pool = require("../config/db");
 
-const createQuiz = (req, res) => {
-  const { title, description, created_by } = req.body;
+exports.saveQuizResult = async (req, res) => {
+  try {
+    const {
+      title,
+      score,
+      totalQuestions,
+      accuracy,
+    } = req.body;
 
-  if (!title) {
-    return res.status(400).json({
-      message: "Title is required",
+    const userId = req.user.id;
+
+    await pool.query(
+      `
+      INSERT INTO quiz_results
+      (
+        user_id,
+        title,
+        score,
+        total_questions,
+        accuracy
+      )
+      VALUES ($1,$2,$3,$4,$5)
+      `,
+      [
+        userId,
+        title,
+        score,
+        totalQuestions,
+        accuracy,
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Quiz saved successfully",
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
     });
   }
-
-  const sql = `
-    INSERT INTO quizzer_quizzes
-    (title, description, created_by)
-    VALUES (?, ?, ?)
-  `;
-
-  db.query(
-    sql,
-    [title, description || "", created_by || null],
-    (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({
-          message: err.message,
-        });
-      }
-
-      res.status(201).json({
-        message: "Quiz created successfully",
-        quizId: result.insertId,
-      });
-    }
-  );
 };
 
-module.exports = { createQuiz };
-const addQuestion = (req, res) => {
-  const {
-    quiz_id,
-    question,
-    option_a,
-    option_b,
-    option_c,
-    option_d,
-    correct_answer,
-  } = req.body;
 
-  const sql = `
-    INSERT INTO quizzer_questions
-    (quiz_id, question, option_a, option_b, option_c, option_d, correct_answer)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
+// GET QUIZ HISTORY
 
-  db.query(
-    sql,
-    [
-      quiz_id,
-      question,
-      option_a,
-      option_b,
-      option_c,
-      option_d,
-      correct_answer,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({
-          message: err.message,
-        });
-      }
+exports.getQuizHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-      res.status(201).json({
-        message: "Question added successfully",
-        questionId: result.insertId,
-      });
-    }
-  );
-};
-module.exports = {
-  createQuiz,
-  addQuestion,
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM quiz_results
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
 };

@@ -2,14 +2,18 @@ const express = require("express");
 const router = express.Router();
 
 const authMiddleware = require("../middleware/authMiddleware");
+const quizController = require("../controllers/quizController");
 
-const {
-  createQuiz,
-  addQuestion,
-} = require("../controllers/quizController");
+router.post(
+  "/save",
+  authMiddleware,
+  quizController.saveQuizResult
+);
 
-// Protected Routes
-router.post("/create", authMiddleware, createQuiz);
-router.post("/add-question", authMiddleware, addQuestion);
+router.get(
+  "/history",
+  authMiddleware,
+  quizController.getQuizHistory
+);
 
 module.exports = router;
