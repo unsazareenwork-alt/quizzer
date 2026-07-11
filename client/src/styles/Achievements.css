@@ -1,0 +1,278 @@
+.achievement-page{
+    background:#d9d2f4;
+    min-height:100vh;
+    padding:40px 0 80px;
+    font-family:'Press Start 2P', monospace;
+}
+
+.achievement-container{
+    width:1180px;
+    margin:auto;
+}
+
+/* ================= PROFILE CARD ================= */
+
+.profile-card{
+    background:linear-gradient(90deg,#6a2ee8,#8a3ffc);
+    border:4px solid #222;
+    box-shadow:8px 8px 0 #3b136d;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:34px;
+    margin-bottom:32px;
+}
+
+.profile-left{
+    display:flex;
+    gap:24px;
+    align-items:center;
+}
+
+/* avatar */
+
+.avatar-box{
+    position:relative;
+}
+
+.avatar{
+    width:64px;
+    height:64px;
+    background:#ffc843;
+
+    border:3px solid #222;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:14px;
+}
+
+.level-badge{
+    position:absolute;
+
+    right:-8px;
+    bottom:-8px;
+
+    width:22px;
+    height:22px;
+
+    background:#ffc843;
+
+    border:2px solid #222;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:10px;
+}
+
+/* info */
+
+.profile-info h2{
+    color:white;
+    font-size:18px;
+    margin-bottom:14px;
+}
+
+.profile-tags{
+    display:flex;
+    gap:12px;
+    margin-bottom:16px;
+}
+
+.tag{
+    padding:10px 14px;
+    border:2px solid #222;
+    font-size:10px;
+}
+
+.level{
+    background:#ffe7a7;
+}
+
+.badges{
+    background:#222;
+    color:white;
+}
+
+.xp-text{
+    color:#1d143b;
+    font-size:11px;
+    margin-bottom:8px;
+}
+
+.xp-bar{
+    width:640px;
+    height:18px;
+
+    border:3px solid #222;
+    background:white;
+
+    overflow:hidden;
+}
+
+.xp-fill{
+    height:100%;
+    background:#ffc843;
+}
+
+.xp-count{
+    margin-top:8px;
+    text-align:right;
+    font-size:12px;
+    color:#111;
+}
+
+/* streak */
+
+.streak-card{
+    background:#fff3c7;
+    border:3px solid #222;
+    box-shadow:4px 4px 0 #ff8a00;
+
+    width:165px;
+    height:92px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.streak-number{
+    font-size:34px;
+}
+
+.streak-text{
+    margin-top:8px;
+    font-size:10px;
+    color:#ff7a00;
+}
+/* ================= BADGES ================= */
+
+.badges-card{
+
+    margin-top:30px;
+
+    background:#faf6ea;
+
+    border:4px solid #222;
+
+    box-shadow:8px 8px 0 #222;
+
+    padding:24px;
+
+}
+
+.badges-card h3{
+
+    font-size:11px;
+
+    margin-bottom:25px;
+
+    color:#444;
+
+}
+
+.badges-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:25px;
+
+}
+
+.badge-item{
+
+    background:white;
+
+    border:3px solid #222;
+
+    box-shadow:5px 5px 0 #222;
+
+    border-radius:14px;
+
+    padding:22px;
+
+    text-align:center;
+
+    transition:.2s;
+
+}
+
+.badge-item:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.badge-item img{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:contain;
+
+    margin-bottom:18px;
+
+}
+
+.badge-item h4{
+
+    font-size:10px;
+
+    margin-bottom:12px;
+
+}
+
+.badge-item p{
+
+    font-size:9px;
+
+    color:#666;
+
+    line-height:1.6;
+
+}
+
+.locked{
+
+    opacity:.55;
+
+    filter:grayscale(100%);
+
+}
+
+.locked img{
+
+    opacity:.7;
+
+}
+
+@media(max-width:1000px){
+
+.badges-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:650px){
+
+.badges-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}

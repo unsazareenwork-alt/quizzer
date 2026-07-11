@@ -8,13 +8,13 @@ export default function PlayQuiz() {
   const navigate = useNavigate();
 
   const [questions, setQuestions] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
+const [currentQuestion, setCurrentQuestion] = useState(0);
 
-  const [selectedOption, setSelectedOption] = useState("");
-  const [showAnswer, setShowAnswer] = useState(false);
+const [selectedOption, setSelectedOption] = useState("");
+const [showAnswer, setShowAnswer] = useState(false);
 
-  const [score, setScore] = useState(0);
-
+const [score, setScore] = useState(0);
+const [answeredQuestions, setAnsweredQuestions] = useState([]);
   useEffect(() => {
     const storedQuiz = JSON.parse(
       localStorage.getItem("generatedQuiz")
@@ -37,16 +37,42 @@ export default function PlayQuiz() {
     ((currentQuestion + 1) / questions.length) * 100;
 
   const handleCheckAnswer = () => {
+    const updatedQuestions = [...questions];
+
+    updatedQuestions[currentQuestion].selectedAnswer =
+      selectedOption;
+
+    updatedQuestions[currentQuestion].isCorrect =
+      selectedOption === question.correctAnswer;
+
+    setQuestions(updatedQuestions);
+
     setShowAnswer(true);
   };
 
   const handleNext = async () => {
     let updatedScore = score;
 
-    if (selectedOption === question.correctAnswer) {
-      updatedScore++;
-      setScore(updatedScore);
-    }
+    const isCorrect =
+  selectedOption === question.correctAnswer;
+
+if (isCorrect) {
+  updatedScore++;
+  setScore(updatedScore);
+}
+
+const updatedAnswered = [
+  ...answeredQuestions,
+  {
+    question: question.question,
+    correctAnswer: question.correctAnswer,
+    selectedAnswer: selectedOption,
+    explanation: question.explanation,
+    isCorrect,
+  },
+];
+
+setAnsweredQuestions(updatedAnswered);
 
     if (currentQuestion === questions.length - 1) {
       try {
@@ -59,20 +85,23 @@ export default function PlayQuiz() {
         const accuracy =
           (updatedScore / questions.length) * 100;
 
+        
+
         await axios.post(
-          "http://localhost:5000/api/quizzes/save",
-          {
-            title,
-            score: updatedScore,
-            totalQuestions: questions.length,
-            accuracy,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  "http://localhost:5000/api/quizzes/save",
+  {
+    title,
+    score: updatedScore,
+    totalQuestions: questions.length,
+    accuracy,
+    questions: updatedAnswered,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
         localStorage.setItem(
           "lastScore",
@@ -83,6 +112,7 @@ export default function PlayQuiz() {
           "lastAccuracy",
           accuracy.toFixed(0)
         );
+        setAnsweredQuestions([]);
 
         alert(
           `Quiz Finished!\n\nScore: ${updatedScore}/${questions.length}`
@@ -139,16 +169,16 @@ export default function PlayQuiz() {
             {question.options.map((option, index) => {
               let className = "option-card";
 
-              if (selectedOption === option) {
+              if (selectedOption === option)
                 className += " selected";
-              }
 
               if (showAnswer) {
-                if (option === question.correctAnswer) {
+                if (
+                  option === question.correctAnswer
+                ) {
                   className += " correct";
                 } else if (
-                  option === selectedOption &&
-                  option !== question.correctAnswer
+                  option === selectedOption
                 ) {
                   className += " wrong";
                 }
@@ -164,7 +194,9 @@ export default function PlayQuiz() {
                   }
                 >
                   <div className="option-letter">
-                    {String.fromCharCode(65 + index)}
+                    {String.fromCharCode(
+                      65 + index
+                    )}
                   </div>
 
                   <span>{option}</span>

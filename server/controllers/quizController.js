@@ -3,35 +3,38 @@ const pool = require("../config/db");
 exports.saveQuizResult = async (req, res) => {
   try {
     const {
-      title,
+        title,
       score,
       totalQuestions,
       accuracy,
+      questions,
+
     } = req.body;
 
     const userId = req.user.id;
 
     await pool.query(
-      `
-      INSERT INTO quiz_results
-      (
-        user_id,
-        title,
-        score,
-        total_questions,
-        accuracy
-      )
-      VALUES ($1,$2,$3,$4,$5)
-      `,
-      [
-        userId,
-        title,
-        score,
-        totalQuestions,
-        accuracy,
-      ]
-    );
-
+  `
+  INSERT INTO quiz_results
+  (
+    user_id,
+    title,
+    score,
+    total_questions,
+    accuracy,
+    questions
+  )
+  VALUES ($1,$2,$3,$4,$5,$6)
+  `,
+  [
+    userId,
+    title,
+    score,
+    totalQuestions,
+    accuracy,
+    JSON.stringify(questions),
+  ]
+);
     res.status(201).json({
       success: true,
       message: "Quiz saved successfully",

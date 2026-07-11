@@ -1,0 +1,115 @@
+.improvement-page{
+    background:#d9d0f5;
+    min-height:100vh;
+    padding:35px 0 70px;
+}
+
+.improvement-container{
+    width:1150px;
+    margin:auto;
+}
+
+.page-title{
+    font-family:"Press Start 2P", monospace;
+    font-size:22px;
+    margin-bottom:25px;
+    color:#222;
+}
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:18px;
+}
+
+.stat-card{
+    background:#faf6ea;
+    border:3px solid #222;
+    box-shadow:6px 6px 0 #222;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    height:110px;
+}
+
+.stat-icon{
+    font-size:32px;
+}
+
+.stat-card span{
+    display:block;
+    font-family:"Press Start 2P", monospace;
+    font-size:11px;
+    color:#666;
+    margin-bottom:12px;
+}
+
+.stat-card h2{
+    font-size:46px;
+    margin:0;
+    font-weight:300;
+    color:#222;
+}
+
+.charts-row{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:18px;
+    margin-top:18px;
+}
+
+.chart-card{
+    background:#faf6ea;
+    border:3px solid #222;
+    box-shadow:6px 6px 0 #222;
+    padding:22px;
+    min-height:330px;
+}
+
+.chart-card h3{
+    font-family:"Press Start 2P", monospace;
+    font-size:11px;
+    margin-bottom:25px;
+    color:#444;
+}
+
+.improvement-card{
+    margin-top:18px;
+    background:#faf6ea;
+    border:3px solid #222;
+    box-shadow:6px 6px 0 #222;
+    padding:25px;
+    min-height:260px;
+}
+
+.improvement-card h3{
+    font-family:"Press Start 2P", monospace;
+    font-size:11px;
+    margin-bottom:25px;
+}
+
+@media(max-width:1200px){
+
+.improvement-container{
+    width:95%;
+}
+
+.stats-grid{
+    grid-template-columns:repeat(2,1fr);
+}
+
+.charts-row{
+    grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:700px){
+
+.stats-grid{
+    grid-template-columns:1fr;
+}
+
+}

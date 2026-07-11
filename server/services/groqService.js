@@ -15,7 +15,7 @@ async function generateQuiz(text) {
         {
           role: "system",
           content:
-            "You are a quiz generator. Return ONLY valid JSON. No markdown. No explanations outside JSON.",
+            "You are a quiz generator. Return ONLY valid JSON. Do not use markdown. Every question MUST contain a topic field describing the subject of the question.",
         },
 
         {
@@ -25,19 +25,30 @@ Generate exactly 5 multiple-choice questions from the following notes.
 
 Return ONLY ONE valid JSON array.
 
+Each object MUST contain:
+
+- question
+- options (4 options)
+- correctAnswer
+- explanation
+- topic
+
+The topic should be short (1-3 words).
+
 Example:
 
 [
   {
-    "question":"Question here",
+    "question":"Which Article deals with Fundamental Rights?",
     "options":[
-      "Option A",
-      "Option B",
-      "Option C",
-      "Option D"
+      "Article 12",
+      "Article 32",
+      "Article 19",
+      "Article 14"
     ],
-    "correctAnswer":"Option A",
-    "explanation":"Short explanation."
+    "correctAnswer":"Article 32",
+    "explanation":"Article 32 allows citizens to move the Supreme Court for enforcement of Fundamental Rights.",
+    "topic":"Fundamental Rights"
   }
 ]
 
@@ -55,21 +66,29 @@ ${text}
     console.log(content);
     console.log("\n===============================================\n");
 
-    // Try direct JSON first
+    let questions;
+
     try {
-      return JSON.parse(content);
+      questions = JSON.parse(content);
     } catch (err) {
       console.log("Direct parse failed...");
 
-      // Extract first JSON array
       const match = content.match(/\[[\s\S]*\]/);
 
       if (!match) {
         throw new Error("No JSON array found in AI response.");
       }
 
-      return JSON.parse(match[0]);
+      questions = JSON.parse(match[0]);
     }
+
+    // Ensure every question has a topic
+    questions = questions.map((q) => ({
+      ...q,
+      topic: q.topic || "General",
+    }));
+
+    return questions;
   } catch (err) {
     console.error("Groq Error:");
     console.error(err);

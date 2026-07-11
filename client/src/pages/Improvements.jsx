@@ -1,40 +1,105 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import Navbar from "../components/Navbar";
+
+
 import {
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
+  PieChart,
+  Pie,
+  Cell,
   CartesianGrid,
-  ResponsiveContainer,
 } from "recharts";
 
+import "../styles/Improvements.css";
+
 function Improvements() {
-  const history =
-    JSON.parse(localStorage.getItem("quizHistory")) || [];
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const lineData = history.map((quiz, index) => ({
-    quiz: `Quiz ${index + 1}`,
-    score: quiz.score,
-  }));
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
-  let totalCorrect = 0;
-  let totalQuestions = 0;
-  let bestScore = 0;
+  const fetchHistory = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-  history.forEach((quiz) => {
-    totalCorrect += quiz.score;
-    totalQuestions += quiz.total;
+      const response = await axios.get(
+        "http://localhost:5000/api/quizzes/history",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    if (quiz.score > bestScore) {
-      bestScore = quiz.score;
+      const sortedHistory = [...response.data].sort(
+        (a, b) =>
+          new Date(a.created_at) -
+          new Date(b.created_at)
+      );
+
+      setHistory(sortedHistory);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  });
+  };
+
+  /* ===========================
+      STATS
+  ============================ */
+
+  const totalQuizzes = history.length;
+
+  const bestScore =
+    history.length > 0
+      ? Math.max(...history.map((q) => q.score))
+      : 0;
+
+  const totalCorrect = history.reduce(
+    (sum, quiz) => sum + Number(quiz.score),
+    0
+  );
+
+  const totalQuestions = history.reduce(
+    (sum, quiz) =>
+      sum + Number(quiz.total_questions),
+    0
+  );
 
   const totalWrong =
     totalQuestions - totalCorrect;
+
+  const accuracy =
+    totalQuestions > 0
+      ? (
+          (totalCorrect / totalQuestions) *
+          100
+        ).toFixed(0)
+      : 0;
+
+  /* ===========================
+      BAR CHART
+  ============================ */
+
+  const chartData = history.map(
+    (quiz, index) => ({
+      quiz: `Q${index + 1}`,
+      score: quiz.score,
+    })
+  );
+
+  /* ===========================
+      PIE CHART
+  ============================ */
 
   const pieData = [
     {
@@ -42,281 +107,198 @@ function Improvements() {
       value: totalCorrect,
     },
     {
-      name: "Incorrect",
+      name: "Wrong",
       value: totalWrong,
     },
   ];
 
   const COLORS = [
-    "#00C49F",
-    "#FF4D4F",
+    "#8B5CF6",
+    "#F87171",
   ];
 
-  const averageScore =
-    history.length > 0
-      ? (
-          history.reduce(
-            (sum, quiz) => sum + quiz.score,
-            0
-          ) / history.length
-        ).toFixed(2)
-      : 0;
+  /* ===========================
+      WEAK AREAS
+  ============================ */
 
-  const accuracy =
-    totalQuestions > 0
-      ? (
-          (totalCorrect / totalQuestions) *
-          100
-        ).toFixed(2)
-      : 0;
-
-  // ===== Weak Areas =====
-
-  const weakAreasMap = {};
+  const weakMap = {};
 
   history.forEach((quiz) => {
     if (!quiz.questions) return;
 
     quiz.questions.forEach((question) => {
       if (!question.isCorrect) {
-        let topic = "General";
-
-        const q =
-          question.question.toLowerCase();
-
-        if (
-          q.includes("language") ||
-          q.includes("hindi") ||
-          q.includes("sinhala")
-        ) {
-          topic = "Language Policy";
-        } else if (
-          q.includes("constitution") ||
-          q.includes("schedule")
-        ) {
-          topic = "Indian Constitution";
-        } else if (
-          q.includes("agitation") ||
-          q.includes("state")
-        ) {
-          topic = "Regional Movements";
-        } else if (
-          q.includes("technology") ||
-          q.includes("education")
-        ) {
-          topic = "Technology & Education";
-        }
-
-        weakAreasMap[topic] =
-          (weakAreasMap[topic] || 0) + 1;
+        weakMap[question.question] =
+          (weakMap[question.question] || 0) + 1;
       }
     });
   });
 
-  const weakAreas =
-    Object.entries(weakAreasMap);
+  const weakAreas = Object.entries(
+    weakMap
+  ).sort((a, b) => b[1] - a[1]);
 
+  /* ===========================
+      INSIGHT
+  ============================ */
+
+const improved =
+  history.length >= 2 &&
+  history[history.length - 1].score >
+    history[history.length - 2].score;
+
+if (loading) {
   return (
-    <div
-      style={{
-        padding: "20px",
-        maxWidth: "1000px",
-        margin: "auto",
-      }}
-    >
-      <h1>Improvements</h1>
-
-      {/* Stats */}
-
-      <div
-        style={{
-          display: "flex",
-          gap: "20px",
-          flexWrap: "wrap",
-          marginBottom: "30px",
-        }}
-      >
-        <div>
-          <h3>
-            Total Quizzes: {history.length}
-          </h3>
-        </div>
-
-        <div>
-          <h3>
-            Average Score: {averageScore}
-          </h3>
-        </div>
-
-        <div>
-          <h3>
-            Best Score: {bestScore}
-          </h3>
-        </div>
-
-        <div>
-          <h3>
-            Accuracy: {accuracy}%
-          </h3>
-        </div>
+    <>
+      <Navbar />
+      <div className="loading-page">
+        Loading...
       </div>
+    </>
+  );
+}
 
-      {/* Line Chart */}
+return (
+  <>
+    <Navbar />
 
-      <h2>Performance Trend</h2>
+    <div className="improvement-page">
+      <div className="improvement-container">
 
-      <div
-        style={{
-          width: "100%",
-          height: 350,
-        }}
-      >
-        <ResponsiveContainer>
-          <LineChart data={lineData}>
-            <CartesianGrid strokeDasharray="3 3" />
+        <h1 className="page-title">
+          Improvements
+        </h1>
 
-            <XAxis dataKey="quiz" />
+        {/* TOP CARDS */}
 
-            <YAxis />
+        <div className="stats-grid">
 
-            <Tooltip />
+          <div className="stat-card">
+            <div className="stat-icon">📑</div>
 
-            <Line
-              type="monotone"
-              dataKey="score"
-              stroke="#8884d8"
-              strokeWidth={3}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+            <div>
+              <span>QUIZZES</span>
+              <h2>{totalQuizzes}</h2>
+            </div>
+          </div>
 
-      {/* Pie Chart */}
+          <div className="stat-card">
+            <div className="stat-icon">🎯</div>
 
-      <h2
-        style={{
-          marginTop: "40px",
-        }}
-      >
-        Accuracy Breakdown
-      </h2>
+            <div>
+              <span>ACCURACY</span>
+              <h2>{accuracy}%</h2>
+            </div>
+          </div>
 
-      <div
-        style={{
-          width: "100%",
-          height: 350,
-        }}
-      >
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              dataKey="value"
-              label
-            >
-              {pieData.map(
-                (entry, index) => (
-                  <Cell
-                    key={index}
-                    fill={COLORS[index]}
-                  />
-                )
-              )}
-            </Pie>
+          <div className="stat-card">
+            <div className="stat-icon">🏆</div>
 
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+            <div>
+              <span>BEST SCORE</span>
+              <h2>{bestScore}</h2>
+            </div>
+          </div>
 
-      {/* Weak Areas */}
+          <div className="stat-card">
+            <div className="stat-icon">🔥</div>
 
-      <h2>Areas Needing Improvement</h2>
+            <div>
+              <span>DAY STREAK</span>
+              <h2>7</h2>
+            </div>
+          </div>
 
-      {weakAreas.length === 0 ? (
-        <p>
-          Great job! No weak areas
-          detected yet.
-        </p>
-      ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px",
-            marginTop: "15px",
-          }}
-        >
-          {weakAreas.map(
-            ([topic, count], index) => (
+        </div>
+
+        {/* CHARTS */}
+
+        <div className="charts-row">
+
+          <div className="chart-card">
+
+            <h3>Score Trend</h3>
+
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="quiz" />
+                <YAxis />
+                <Tooltip />
+                <Bar
+                  dataKey="score"
+                  fill="#8B5CF6"
+                  radius={[6, 6, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+
+          </div>
+
+          <div className="chart-card">
+
+            <h3>Accuracy</h3>
+
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  innerRadius={55}
+                  outerRadius={85}
+                  label
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell
+                      key={index}
+                      fill={COLORS[index]}
+                    />
+                  ))}
+                </Pie>
+
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+
+          </div>
+
+        </div>
+
+        {/* IMPROVEMENTS */}
+
+        <div className="improvement-card">
+
+          <h3>Areas To Improve</h3>
+
+          {weakAreas.length === 0 ? (
+            <p>🎉 Great job! No weak areas found.</p>
+          ) : (
+            weakAreas.map(([question, count], index) => (
               <div
                 key={index}
                 style={{
-                  padding: "12px",
-                  border:
-                    "1px solid #444",
-                  borderRadius: "8px",
-                  background:
-                    "rgba(255,255,255,0.05)",
+                  border: "2px solid #222",
+                  borderRadius: "10px",
+                  padding: "14px",
+                  marginBottom: "12px",
+                  background: "#fff",
                 }}
               >
-                <h3>{topic}</h3>
+                <strong>{question}</strong>
 
-                <p>
-                  Missed {count} time
-                  {count > 1 ? "s" : ""}
+                <p style={{ marginTop: "8px" }}>
+                  Missed {count} time{count > 1 ? "s" : ""}
                 </p>
               </div>
-            )
+            ))
           )}
+
         </div>
-      )}
 
-      {/* Learning Insight */}
-
-      <h2
-        style={{
-          marginTop: "40px",
-        }}
-      >
-        Learning Insight
-      </h2>
-
-      <p>
-        You have completed{" "}
-        {history.length} quizzes with
-        an overall accuracy of{" "}
-        {accuracy}%.
-      </p>
-
-      <p>
-        Your highest score so far is{" "}
-        {bestScore}.
-      </p>
-
-      {history.length >= 2 &&
-        history[
-          history.length - 1
-        ]?.score >
-          history[
-            history.length - 2
-          ]?.score && (
-          <p
-            style={{
-              color: "green",
-              fontWeight: "bold",
-            }}
-          >
-             Your latest score
-            improved compared to the
-            previous quiz!
-          </p>
-        )}
+      </div>
     </div>
-  );
+  </>
+);
 }
 
 export default Improvements;
