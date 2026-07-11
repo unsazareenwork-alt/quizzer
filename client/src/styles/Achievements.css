@@ -276,3 +276,123 @@ grid-template-columns:1fr;
 }
 
 }
+/* HERO */
+
+.achievement-hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:linear-gradient(90deg,#6d28d9,#8b5cf6);
+
+    border:5px solid #222;
+    box-shadow:8px 8px #222;
+
+    padding:35px 40px;
+
+    margin-bottom:35px;
+}
+
+.hero-left{
+    display:flex;
+    align-items:center;
+    gap:30px;
+}
+
+.profile-box{
+    position:relative;
+}
+
+.profile-avatar{
+    width:75px;
+    height:75px;
+
+    background:#ffc94d;
+
+    border:3px solid #222;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:28px;
+    font-weight:bold;
+}
+
+.profile-level{
+    position:absolute;
+
+    right:-12px;
+    bottom:-12px;
+
+    width:28px;
+    height:28px;
+
+    background:#ffc94d;
+
+    border:3px solid #222;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:14px;
+}
+
+.hero-info h2{
+    color:white;
+    margin-bottom:12px;
+}
+
+.hero-tags{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.hero-tags span{
+    background:#fff2cf;
+    border:3px solid #222;
+    padding:6px 14px;
+    font-size:14px;
+}
+
+.xp-title{
+    color:white;
+    margin-bottom:8px;
+}
+
+.xp-bar{
+    width:420px;
+    height:22px;
+
+    background:white;
+
+    border:3px solid #222;
+}
+
+.xp-fill{
+    width:65%;
+    height:100%;
+    background:#ffc94d;
+}
+
+.streak-box{
+    background:#fff2cf;
+
+    border:3px solid #222;
+
+    width:180px;
+
+    text-align:center;
+
+    padding:20px;
+}
+
+.streak-box h1{
+    font-size:45px;
+}
+
+.streak-box span{
+    color:#ff7a00;
+}
