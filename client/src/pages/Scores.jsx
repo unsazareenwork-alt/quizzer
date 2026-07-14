@@ -1,91 +1,133 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import Navbar from "../components/Navbar";
+import "../styles/Scores.css";
 
-function Scores() {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+const history = [
+  {
+    title: "cell-biology-ch4.txt",
+    subject: "Cell Biology",
+    date: "01/12/2026",
+    score: "5 / 5",
+    percentage: "100%",
+    color: "green",
+  },
+  {
+    title: "physics-notes.txt",
+    subject: "Physics",
+    date: "01/11/2026",
+    score: "4 / 5",
+    percentage: "80%",
+    color: "green",
+  },
+  {
+    title: "unsa-debate (1).txt",
+    subject: "World History",
+    date: "01/09/2026",
+    score: "4 / 5",
+    percentage: "80%",
+    color: "green",
+  },
+  {
+    title: "chem-reactions.txt",
+    subject: "Chemistry",
+    date: "01/08/2026",
+    score: "3 / 5",
+    percentage: "60%",
+    color: "yellow",
+  },
+  {
+    title: "unsa-debate.txt",
+    subject: "World History",
+    date: "01/08/2026",
+    score: "1 / 5",
+    percentage: "20%",
+    color: "red",
+  },
+];
 
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await axios.get(
-        "http://localhost:5000/api/quizzes/history",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setHistory(response.data);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to load quiz history.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function Scores() {
   return (
     <>
       <Navbar />
 
-      <div
-        style={{
-          padding: "40px",
-          maxWidth: "900px",
-          margin: "auto",
-        }}
-      >
-        <h1>Quiz History</h1>
+      <div className="scores-page">
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : history.length === 0 ? (
-          <p>No quizzes taken yet.</p>
-        ) : (
-          history.map((quiz) => (
-            <div
-              key={quiz.id}
-              style={{
-                border: "2px solid #17131F",
-                borderRadius: "12px",
-                padding: "20px",
-                marginBottom: "20px",
-                background: "#FFFDF5",
-                boxShadow: "5px 5px 0 #17131F",
-              }}
-            >
-              <h2>{quiz.title}</h2>
+        <div className="scores-container">
 
-              <p>
-                <strong>Score:</strong>{" "}
-                {quiz.score}/{quiz.total_questions}
-              </p>
+          {/* TOP CARDS */}
 
-              <p>
-                <strong>Accuracy:</strong>{" "}
-                {Math.round(Number(quiz.accuracy))}%
-              </p>
+          <div className="stats-grid">
 
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(
-                  quiz.created_at
-                ).toLocaleDateString()}
-              </p>
+            <div className="score-stat">
+              <span> QUIZZES TAKEN</span>
+              <h2>6</h2>
             </div>
-          ))
-        )}
+
+            <div className="score-stat">
+              <span> AVG ACCURACY</span>
+              <h2>70%</h2>
+            </div>
+
+            <div className="score-stat">
+              <span> BEST SCORE</span>
+              <h2>5</h2>
+            </div>
+
+            <div className="score-stat">
+              <span> DAY STREAK</span>
+              <h2>7</h2>
+            </div>
+
+          </div>
+
+          {/* HISTORY */}
+
+          <div className="history-card">
+
+            <h2> QUIZ HISTORY</h2>
+
+            {history.map((quiz, index) => (
+
+              <div className="history-row" key={index}>
+
+                <div className="history-left">
+
+                  <div className="file-icon">
+                    
+                  </div>
+
+                  <div>
+
+                    <h4>{quiz.title}</h4>
+
+                    <p>
+                      {quiz.subject} • {quiz.date}
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <div className="history-right">
+
+                  <div className={`score-box ${quiz.color}`}>
+                    {quiz.score}
+                  </div>
+
+                  <h3>{quiz.percentage}</h3>
+
+                  <span>›</span>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
       </div>
     </>
   );
 }
-
-export default Scores;
