@@ -9,6 +9,7 @@ import Improvements from "./pages/Improvements";
 import Achievements from "./pages/Achievements";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PlayQuiz from "./pages/PlayQuiz";
+import ReviewQuiz from "./pages/ReviewQuiz";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      
 
       {/* Protected Routes */}
       <Route
@@ -61,6 +63,10 @@ function App() {
       <PlayQuiz />
     </ProtectedRoute>
   }
+/>
+<Route
+    path="/review"
+    element={<ReviewQuiz />}
 />
 
       <Route

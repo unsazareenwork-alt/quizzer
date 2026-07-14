@@ -51,87 +51,90 @@ const [answeredQuestions, setAnsweredQuestions] = useState([]);
   };
 
   const handleNext = async () => {
-    let updatedScore = score;
+  let updatedScore = score;
 
-    const isCorrect =
-  selectedOption === question.correctAnswer;
+  const isCorrect =
+    selectedOption === question.correctAnswer;
 
-if (isCorrect) {
-  updatedScore++;
-  setScore(updatedScore);
-}
-
-const updatedAnswered = [
-  ...answeredQuestions,
-  {
-    question: question.question,
-    correctAnswer: question.correctAnswer,
-    selectedAnswer: selectedOption,
-    explanation: question.explanation,
-    isCorrect,
-  },
-];
-
-setAnsweredQuestions(updatedAnswered);
-
-    if (currentQuestion === questions.length - 1) {
-      try {
-        const token = localStorage.getItem("token");
-
-        const title =
-          localStorage.getItem("quizTitle") ||
-          "Generated Quiz";
-
-        const accuracy =
-          (updatedScore / questions.length) * 100;
-
-        
-
-        await axios.post(
-  "http://localhost:5000/api/quizzes/save",
-  {
-    title,
-    score: updatedScore,
-    totalQuestions: questions.length,
-    accuracy,
-    questions: updatedAnswered,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  if (isCorrect) {
+    updatedScore++;
+    setScore(updatedScore);
   }
-);
 
-        localStorage.setItem(
-          "lastScore",
-          updatedScore
-        );
+  const finalAnsweredQuestions = [
+    ...answeredQuestions,
+    {
+      question: question.question,
+      options: question.options,
+      selectedAnswer: selectedOption,
+      correctAnswer: question.correctAnswer,
+      explanation: question.explanation,
+      isCorrect,
+    },
+  ];
 
-        localStorage.setItem(
-          "lastAccuracy",
-          accuracy.toFixed(0)
-        );
-        setAnsweredQuestions([]);
+  setAnsweredQuestions(finalAnsweredQuestions);
 
-        alert(
-          `Quiz Finished!\n\nScore: ${updatedScore}/${questions.length}`
-        );
+  if (currentQuestion === questions.length - 1) {
+    try {
+      const token = localStorage.getItem("token");
 
-        navigate("/scores");
-      } catch (err) {
-        console.error(err);
-        alert("Failed to save quiz.");
-      }
+      const title =
+        localStorage.getItem("quizTitle") ||
+        "Generated Quiz";
 
+      const accuracy =
+        (updatedScore / questions.length) * 100;
+
+      console.log(
+        "Questions being sent:",
+        finalAnsweredQuestions
+      );
+
+      await axios.post(
+        "http://localhost:5000/api/quizzes/save",
+        {
+          title,
+          score: updatedScore,
+          totalQuestions: questions.length,
+          accuracy,
+          questions: finalAnsweredQuestions,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      localStorage.setItem(
+        "lastScore",
+        updatedScore
+      );
+
+      localStorage.setItem(
+        "lastAccuracy",
+        accuracy.toFixed(0)
+      );
+
+      alert(
+        `Quiz Finished!\n\nScore: ${updatedScore}/${questions.length}`
+      );
+
+      navigate("/scores");
+      return;
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save quiz.");
       return;
     }
+  }
 
-    setCurrentQuestion((prev) => prev + 1);
-    setSelectedOption("");
-    setShowAnswer(false);
-  };
-
+  setCurrentQuestion((prev) => prev + 1);
+  setSelectedOption("");
+  setShowAnswer(false);
+};
   return (
     <>
       <Navbar />
