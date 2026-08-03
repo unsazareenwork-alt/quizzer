@@ -1,7 +1,88 @@
 import Navbar from "../components/Navbar";
 import "../styles/Achievements.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 
 export default function Achievements() {
+  const [history, setHistory] = useState([]);
+const [loading, setLoading] = useState(true);
+useEffect(() => {
+  fetchHistory();
+}, []);
+
+const fetchHistory = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      "http://localhost:5000/api/quizzes/history",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setHistory(response.data);
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+const quizzesTaken = history.length;
+
+const totalCorrect = history.reduce(
+  (sum, quiz) => sum + Number(quiz.score),
+  0
+);
+
+const totalQuestions = history.reduce(
+  (sum, quiz) => sum + Number(quiz.total_questions),
+  0
+);
+
+const accuracy =
+  totalQuestions > 0
+    ? Math.round((totalCorrect / totalQuestions) * 100)
+    : 0;
+
+const xp = totalCorrect * 10;
+
+const level = Math.floor(xp / 100) + 1;
+
+const currentLevelXP = (level - 1) * 100;
+
+const nextLevelXP = level * 100;
+
+const xpPercent =
+  ((xp - currentLevelXP) / 100) * 100;
+  const uniqueDates = [
+  ...new Set(
+    history.map((quiz) => {
+      const d = new Date(quiz.created_at);
+      return d.toISOString().split("T")[0]; // YYYY-MM-DD
+    })
+  ),
+];
+
+let streak = 0;
+
+let current = new Date();
+
+while (true) {
+  const dateString = current.toISOString().split("T")[0];
+
+  if (uniqueDates.includes(dateString)) {
+    streak++;
+    current.setDate(current.getDate() - 1);
+  } else {
+    break;
+  }
+  
+}
   return (
     <>
       <Navbar />
@@ -22,7 +103,7 @@ export default function Achievements() {
                 </div>
 
                 <div className="level-badge">
-                  7
+                  {level}
                 </div>
 
               </div>
@@ -34,11 +115,11 @@ export default function Achievements() {
                 <div className="profile-tags">
 
                   <div className="tag level">
-                    LEVEL 7
+                    LEVEL {level}
                   </div>
 
                   <div className="tag badges">
-                    4 / 8 BADGES
+                    {quizzesTaken} QUIZZES
                   </div>
 
                 </div>
@@ -47,15 +128,15 @@ export default function Achievements() {
                   XP → LEVEL
                 </div>
 
-                <div className="xp-bar">
-                  <div
-                    className="xp-fill"
-                    style={{ width: "64%" }}
-                  ></div>
-                </div>
+                <div
+                className="xp-fill"
+                 style={{
+                width: `${xpPercent}%`
+               }}
+              ></div>
 
                 <div className="xp-count">
-                  320 / 500 XP
+                  {xp} / {nextLevelXP} XP
                 </div>
 
               </div>
@@ -65,8 +146,8 @@ export default function Achievements() {
             <div className="streak-card">
 
               <div className="streak-number">
-                7
-              </div>
+              {streak}
+                </div>
 
               <div className="streak-text">
                 DAY STREAK

@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import "../styles/UploadQuiz.css";
 
 export default function UploadQuiz() {
+
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
@@ -12,37 +13,169 @@ export default function UploadQuiz() {
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [history, setHistory] = useState([]);
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:5000/api/quizzes/history",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const quizzes = response.data;
+
+      setHistory(quizzes);
+
+      calculateStreak(quizzes);
+
+    } catch (err) {
+
+      console.error(err);
+
+    }
+
+  };
+
+  /* =========================
+          STREAK
+  ========================== */
+
+  const calculateStreak = (quizzes) => {
+
+    if (quizzes.length === 0) {
+      setStreak(0);
+      return;
+    }
+
+    const uniqueDates = [
+      ...new Set(
+        quizzes.map(q =>
+          new Date(q.created_at).toDateString()
+        )
+      ),
+    ];
+
+    uniqueDates.sort(
+      (a, b) => new Date(b) - new Date(a)
+    );
+
+    let count = 0;
+
+    let today = new Date();
+
+    for (let i = 0; i < uniqueDates.length; i++) {
+
+      const expected = new Date(today);
+
+      expected.setDate(today.getDate() - i);
+
+      if (
+        new Date(uniqueDates[i]).toDateString() ===
+        expected.toDateString()
+      ) {
+
+        count++;
+
+      } else {
+
+        break;
+
+      }
+
+    }
+
+    setStreak(count);
+
+  };
+
+  /* =========================
+          STATS
+  ========================== */
+
+  const quizzesTaken = history.length;
+
+  const totalCorrect = history.reduce(
+    (sum, quiz) => sum + Number(quiz.score),
+    0
+  );
+
+  const totalQuestions = history.reduce(
+    (sum, quiz) => sum + Number(quiz.total_questions),
+    0
+  );
+
+  const avgAccuracy =
+    totalQuestions > 0
+      ? Math.round(
+          (totalCorrect / totalQuestions) * 100
+        )
+      : 0;
+
+  const recentQuizzes = history.slice(0, 3);
+
+  /* =========================
+        FILE PICKER
+  ========================== */
+
   const openPicker = () => {
     inputRef.current.click();
   };
 
   const handleFile = (selectedFile) => {
+
     if (!selectedFile) return;
 
     if (!selectedFile.name.endsWith(".txt")) {
+
       alert("Please upload a TXT file.");
+
       return;
+
     }
 
     setFile(selectedFile);
+
   };
 
   const handleDrop = (e) => {
+
     e.preventDefault();
+
     setDragging(false);
 
     if (e.dataTransfer.files.length > 0) {
+
       handleFile(e.dataTransfer.files[0]);
+
     }
+
   };
+    /* =========================
+        GENERATE QUIZ
+  ========================== */
 
   const generateQuiz = async () => {
+
     if (!file) {
       alert("Please upload a TXT file first.");
       return;
     }
 
     try {
+
       setLoading(true);
 
       const token = localStorage.getItem("token");
@@ -61,29 +194,37 @@ export default function UploadQuiz() {
       );
 
       localStorage.setItem(
-  "generatedQuiz",
-  JSON.stringify(response.data.questions)
-);
+        "generatedQuiz",
+        JSON.stringify(response.data.questions)
+      );
 
-localStorage.setItem(
-  "quizTitle",
-  file.name
-);
+      localStorage.setItem(
+        "quizTitle",
+        file.name
+      );
 
       alert("Quiz Generated Successfully!");
 
       navigate("/playquiz");
+
     } catch (err) {
+
       console.error(err);
 
       alert("Failed to generate quiz.");
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
   return (
+
     <>
+
       <Navbar />
 
       <div className="upload-page">
@@ -107,7 +248,9 @@ localStorage.setItem(
             </div>
 
             <div
-              className={`drop-zone ${dragging ? "dragging" : ""}`}
+              className={`drop-zone ${
+                dragging ? "dragging" : ""
+              }`}
               onClick={openPicker}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -116,6 +259,7 @@ localStorage.setItem(
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
             >
+
               <div className="upload-icon">
                 ☁️
               </div>
@@ -140,9 +284,11 @@ localStorage.setItem(
                   handleFile(e.target.files[0])
                 }
               />
+
             </div>
 
             {file && (
+
               <div className="file-card">
 
                 <span>
@@ -154,6 +300,7 @@ localStorage.setItem(
                 </span>
 
               </div>
+
             )}
 
             <button
@@ -161,16 +308,19 @@ localStorage.setItem(
               disabled={!file || loading}
               onClick={generateQuiz}
             >
+
               {loading
                 ? "Generating..."
                 : "⚡ GENERATE QUIZ"}
+
             </button>
 
           </div>
-
-          {/* RIGHT */}
+                    {/* RIGHT */}
 
           <div className="right-panel">
+
+            {/* STREAK */}
 
             <div className="streak-card">
 
@@ -186,7 +336,7 @@ localStorage.setItem(
 
               <div className="streak-box">
 
-                <h2>7</h2>
+                <h2>{streak}</h2>
 
                 <span>DAY STREAK</span>
 
@@ -194,13 +344,15 @@ localStorage.setItem(
 
             </div>
 
+            {/* STATS */}
+
             <div className="stats-grid">
 
               <div className="mini-card">
 
                 <small>QUIZZES</small>
 
-                <h2>16</h2>
+                <h2>{quizzesTaken}</h2>
 
               </div>
 
@@ -208,11 +360,13 @@ localStorage.setItem(
 
                 <small>ACCURACY</small>
 
-                <h2>82%</h2>
+                <h2>{avgAccuracy}%</h2>
 
               </div>
 
             </div>
+
+            {/* RECENT QUIZZES */}
 
             <div className="recent-card">
 
@@ -220,20 +374,35 @@ localStorage.setItem(
 
               <ul>
 
-                <li>
-                  Physics
-                  <span>4/5</span>
-                </li>
+                {recentQuizzes.length === 0 ? (
 
-                <li>
-                  React
-                  <span>5/5</span>
-                </li>
+                  <li>No quizzes yet</li>
 
-                <li>
-                  Biology
-                  <span>4/5</span>
-                </li>
+                ) : (
+
+                  recentQuizzes.map((quiz) => (
+
+                    <li key={quiz.id}>
+
+                      <span className="recent-title">
+
+                        {quiz.title.length > 18
+                          ? quiz.title.substring(0, 18) + "..."
+                          : quiz.title}
+
+                      </span>
+
+                      <span>
+
+                        {quiz.score}/{quiz.total_questions}
+
+                      </span>
+
+                    </li>
+
+                  ))
+
+                )}
 
               </ul>
 
@@ -244,6 +413,9 @@ localStorage.setItem(
         </div>
 
       </div>
+
     </>
+
   );
+
 }
