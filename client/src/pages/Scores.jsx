@@ -58,6 +58,49 @@ export default function Scores() {
     totalQuestions > 0
       ? Math.round((totalCorrect / totalQuestions) * 100)
       : 0;
+      /* ================= DAY STREAK ================= */
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const quizDates = [
+  ...new Set(
+    history.map((quiz) => {
+      const d = new Date(quiz.created_at);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime();
+    })
+  ),
+].sort((a, b) => b - a);
+
+let streak = 0;
+
+if (quizDates.length > 0) {
+  let current = new Date(today);
+
+  // If no quiz today, allow yesterday only
+  if (quizDates[0] !== today.getTime()) {
+    current.setDate(current.getDate() - 1);
+
+    if (quizDates[0] !== current.getTime()) {
+      current = null;
+    }
+  }
+
+  if (current) {
+    streak = 1;
+
+    for (let i = 1; i < quizDates.length; i++) {
+      current.setDate(current.getDate() - 1);
+
+      if (quizDates[i] === current.getTime()) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+  }
+}
 
   if (loading) {
     return (
@@ -98,7 +141,7 @@ export default function Scores() {
 
             <div className="score-stat">
               <span>DAY STREAK</span>
-              <h2>7</h2>
+              <h2>{streak}</h2>
             </div>
 
           </div>
