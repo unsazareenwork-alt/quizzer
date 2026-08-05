@@ -15,6 +15,7 @@ export default function UploadQuiz() {
 
   const [history, setHistory] = useState([]);
   const [streak, setStreak] = useState(0);
+  const [badges, setBadges] = useState([]);
 
   useEffect(() => {
     fetchHistory();
@@ -35,11 +36,14 @@ export default function UploadQuiz() {
         }
       );
 
-      const quizzes = response.data;
+      console.log(response.data);
 
-      setHistory(quizzes);
+const quizzes = response.data.history;
 
-      calculateStreak(quizzes);
+setHistory(quizzes);
+setBadges(response.data.badges);
+
+calculateStreak(quizzes);
 
     } catch (err) {
 

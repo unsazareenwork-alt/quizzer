@@ -1,22 +1,87 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 import "../styles/Dashboard.css";
 
 export default function Dashboard() {
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:5000/api/quizzes/history",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setHistory(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  /* ---------- Statistics ---------- */
+
+  const quizzesTaken = history.length;
+
+  const totalCorrect = history.reduce(
+    (sum, quiz) => sum + Number(quiz.score),
+    0
+  );
+
+  const totalQuestions = history.reduce(
+    (sum, quiz) => sum + Number(quiz.total_questions),
+    0
+  );
+
+  const avgAccuracy =
+    totalQuestions > 0
+      ? Math.round((totalCorrect / totalQuestions) * 100)
+      : 0;
+
+  const totalXP = quizzesTaken * 20;
+
+  // Temporary streak
+  const dayStreak = 7;
+
+  const achievements = [];
+
+  if (quizzesTaken >= 1) {
+    achievements.push(" First Quiz");
+  }
+
+  if (totalXP >= 100) {
+    achievements.push(" 100 XP");
+  }
+
+  if (dayStreak >= 7) {
+    achievements.push(" 7 Day Streak");
+  }
+
+  const recentQuizzes = history.slice(0, 3);
+
   return (
     <div className="dashboard-page">
-
       <Navbar />
 
       <div className="dashboard-container">
-
         <h1 className="welcome">
-          Welcome Back, Unsa 👋
+          Welcome Back, Unsa 
         </h1>
 
         <div className="dashboard-grid">
 
-          {/* LEFT SIDE */}
+          {/* LEFT */}
 
           <div className="left-column">
 
@@ -30,25 +95,28 @@ export default function Dashboard() {
             <div className="card">
               <h2>Recent Quizzes</h2>
 
-              <div className="row">
-                <span>Physics Notes</span>
-                <span>8/10</span>
-              </div>
+              {recentQuizzes.length === 0 ? (
+                <p>No quizzes yet.</p>
+              ) : (
+                recentQuizzes.map((quiz) => (
+                  <div className="row" key={quiz.id}>
+                    <span>
+                      {quiz.title.length > 20
+                        ? quiz.title.substring(0, 20) + "..."
+                        : quiz.title}
+                    </span>
 
-              <div className="row">
-                <span>OS Notes</span>
-                <span>10/10</span>
-              </div>
-
-              <div className="row">
-                <span>React Basics</span>
-                <span>7/10</span>
-              </div>
+                    <span>
+                      {quiz.score}/{quiz.total_questions}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
 
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT */}
 
           <div className="right-column">
 
@@ -57,17 +125,17 @@ export default function Dashboard() {
 
               <div className="row">
                 <span>Accuracy</span>
-                <span>82%</span>
+                <span>{avgAccuracy}%</span>
               </div>
 
               <div className="row">
                 <span>Quizzes</span>
-                <span>16</span>
+                <span>{quizzesTaken}</span>
               </div>
 
               <div className="row">
                 <span>XP</span>
-                <span>320</span>
+                <span>{totalXP}</span>
               </div>
 
             </div>
@@ -75,18 +143,20 @@ export default function Dashboard() {
             <div className="card">
               <h2>Achievements</h2>
 
-              <p>🏆 First Quiz</p>
-              <p>⚡ 100 XP</p>
-              <p>🔥 7 Day Streak</p>
+              {achievements.length === 0 ? (
+                <p>No achievements yet.</p>
+              ) : (
+                achievements.map((achievement, index) => (
+                  <p key={index}>{achievement}</p>
+                ))
+              )}
 
             </div>
 
           </div>
 
         </div>
-
       </div>
-
     </div>
   );
 }

@@ -6,6 +6,7 @@ import axios from "axios";
 
 export default function Achievements() {
   const [history, setHistory] = useState([]);
+const [badges, setBadges] = useState([]);
 const [loading, setLoading] = useState(true);
 useEffect(() => {
   fetchHistory();
@@ -24,7 +25,8 @@ const fetchHistory = async () => {
       }
     );
 
-    setHistory(response.data);
+    setHistory(response.data.history);
+setBadges(response.data.badges || []);
 
   } catch (err) {
     console.error(err);
@@ -184,29 +186,97 @@ while (true) {
 
             <div className="badges-grid">
 
-              <div className="badge-card">
-                <img src="/badges/firststeps.png" alt="First Steps" />
-                <h4>FIRST STEPS</h4>
-                <p>Complete your first quiz</p>
-              </div>
+               <div
+  className={`badge-card ${
+    badges.includes("first_steps") ? "" : "locked"
+  }`}
+>
+  <img
+    src={
+      badges.includes("first_steps")
+        ? "/badges/firststeps.png"
+        : "/badges/locked.png"
+    }
+    alt="First Steps"
+  />
 
-              <div className="badge-card">
-                <img src="/badges/perfectrun.png" alt="Perfect Run" />
-                <h4>PERFECT RUN</h4>
-                <p>Score full marks</p>
-              </div>
+  <h4>FIRST STEPS</h4>
 
-              <div className="badge-card">
-                <img src="/badges/onfire.png" alt="On Fire" />
-                <h4>ON FIRE</h4>
-                <p>7 day streak</p>
-              </div>
+  <p>
+    {badges.includes("first_steps")
+      ? "Complete your first quiz"
+      : "Locked"}
+  </p>
+</div>
 
-              <div className="badge-card">
-                <img src="/badges/highacheiver.png" alt="High Achiever" />k, vb
-                <h4>HIGH ACHIEVER</h4>
-                <p>80% Accuracy</p>
-              </div>
+                <div
+  className={`badge-card ${
+    badges.includes("perfect_run") ? "" : "locked"
+  }`}
+>
+  <img
+    src={
+      badges.includes("perfect_run")
+        ? "/badges/perfectrun.png"
+        : "/badges/locked.png"
+    }
+    alt="Perfect Run"
+  />
+
+  <h4>PERFECT RUN</h4>
+
+  <p>
+    {badges.includes("perfect_run")
+      ? "Score full marks"
+      : "Locked"}
+  </p>
+</div>
+
+              <div
+  className={`badge-card ${
+    badges.includes("on_fire") ? "" : "locked"
+  }`}
+>
+  <img
+    src={
+      badges.includes("on_fire")
+        ? "/badges/onfire.png"
+        : "/badges/locked.png"
+    }
+    alt="On Fire"
+  />
+
+  <h4>ON FIRE</h4>
+
+  <p>
+    {badges.includes("on_fire")
+      ? "7 day streak"
+      : "Locked"}
+  </p>
+</div>
+
+              <div
+  className={`badge-card ${
+    badges.includes("high_achiever") ? "" : "locked"
+  }`}
+>
+  <img
+    src={
+      badges.includes("high_achiever")
+        ? "/badges/highacheiver.png"
+        : "/badges/locked.png"
+    }
+    alt="High Achiever"
+  />
+
+  <h4>HIGH ACHIEVER</h4>
+
+  <p>
+    {badges.includes("high_achiever")
+      ? "80% Accuracy"
+      : "Locked"}
+  </p>
+</div>
 
               <div className="badge-card locked">
                 <img src="/badges/locked.png" alt="Locked" />

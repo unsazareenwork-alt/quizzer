@@ -26,8 +26,11 @@ export default function Scores() {
           },
         }
       );
+      console.log(response.data);
+console.log(response.data.history);
+console.log(Array.isArray(response.data.history));
 
-      setHistory(response.data);
+      setHistory(response.data.history);
     } catch (err) {
       console.error(err);
     } finally {
