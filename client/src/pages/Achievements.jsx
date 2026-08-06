@@ -8,6 +8,8 @@ export default function Achievements() {
   const [history, setHistory] = useState([]);
 const [badges, setBadges] = useState([]);
 const [loading, setLoading] = useState(true);
+const [showUnlock, setShowUnlock] = useState(false);
+const [unlockedBadge, setUnlockedBadge] = useState(null);
 useEffect(() => {
   fetchHistory();
 }, []);
@@ -27,6 +29,26 @@ const fetchHistory = async () => {
 
     setHistory(response.data.history);
 setBadges(response.data.badges || []);
+const previousBadges =
+  JSON.parse(localStorage.getItem("userBadges")) || [];
+
+const newlyUnlocked = response.data.badges.find(
+  badge => !previousBadges.includes(badge)
+);
+
+if (newlyUnlocked) {
+  setUnlockedBadge(newlyUnlocked);
+  setShowUnlock(true);
+
+  setTimeout(() => {
+    setShowUnlock(false);
+  }, 3500);
+}
+
+localStorage.setItem(
+  "userBadges",
+  JSON.stringify(response.data.badges)
+);
 
   } catch (err) {
     console.error(err);
@@ -85,6 +107,12 @@ while (true) {
   }
   
 }
+const badgeImages = {
+  first_steps: "firststeps.png",
+  perfect_run: "perfectrun.png",
+  on_fire: "onfire.png",
+  high_achiever: "highacheiver.png",
+};
   return (
     <>
       <Navbar />
@@ -192,13 +220,13 @@ while (true) {
   }`}
 >
   <img
-    src={
-      badges.includes("first_steps")
-        ? "/badges/firststeps.png"
-        : "/badges/locked.png"
-    }
-    alt="First Steps"
-  />
+  src={
+    badges.includes("first_steps")
+      ? "/badges/firststeps.png"
+      : "/badges/locked.png"
+  }
+  alt="First Steps"
+/>
 
   <h4>FIRST STEPS</h4>
 
@@ -308,6 +336,26 @@ while (true) {
 
         </div>
       </div>
+      {showUnlock && (
+  <div className="badge-unlock-overlay">
+
+    <div className="badge-unlock-card">
+
+     <img
+  src={`/badges/${badgeImages[unlockedBadge]}`}
+  alt={unlockedBadge}
+/>
+
+      <h2>Badge Unlocked</h2>
+
+      <h3>
+  {unlockedBadge.replace(/_/g, " ").toUpperCase()}
+</h3>
+
+    </div>
+
+  </div>
+)}
 
     </>
   );

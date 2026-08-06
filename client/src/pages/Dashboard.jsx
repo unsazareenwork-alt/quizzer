@@ -15,16 +15,16 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.get(
-        "http://localhost:5000/api/quizzes/history",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+     const response = await axios.get(
+  "http://localhost:5000/api/quizzes/history",
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
-      setHistory(response.data);
+setHistory(response.data.history);
     } catch (err) {
       console.error(err);
     }
