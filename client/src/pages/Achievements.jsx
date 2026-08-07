@@ -10,6 +10,7 @@ const [badges, setBadges] = useState([]);
 const [loading, setLoading] = useState(true);
 const [showUnlock, setShowUnlock] = useState(false);
 const [unlockedBadge, setUnlockedBadge] = useState(null);
+const [unlockQueue, setUnlockQueue] = useState([]);
 useEffect(() => {
   fetchHistory();
 }, []);
@@ -32,17 +33,12 @@ setBadges(response.data.badges || []);
 const previousBadges =
   JSON.parse(localStorage.getItem("userBadges")) || [];
 
-const newlyUnlocked = response.data.badges.find(
+const newlyUnlocked = response.data.badges.filter(
   badge => !previousBadges.includes(badge)
 );
 
-if (newlyUnlocked) {
-  setUnlockedBadge(newlyUnlocked);
-  setShowUnlock(true);
-
-  setTimeout(() => {
-    setShowUnlock(false);
-  }, 3500);
+if (newlyUnlocked.length > 0) {
+  setUnlockQueue(newlyUnlocked);
 }
 
 localStorage.setItem(
@@ -113,6 +109,24 @@ const badgeImages = {
   on_fire: "onfire.png",
   high_achiever: "highacheiver.png",
 };
+useEffect(() => {
+  if (unlockQueue.length === 0) return;
+
+  setUnlockedBadge(unlockQueue[0]);
+  setShowUnlock(true);
+
+  const timer = setTimeout(() => {
+    setShowUnlock(false);
+
+    setTimeout(() => {
+      setUnlockQueue(prev => prev.slice(1));
+    }, 300);
+
+  }, 2500);
+
+  return () => clearTimeout(timer);
+
+}, [unlockQueue]);
   return (
     <>
       <Navbar />
@@ -336,7 +350,7 @@ const badgeImages = {
 
         </div>
       </div>
-      {showUnlock && (
+      {showUnlock && unlockedBadge && (
   <div className="badge-unlock-overlay">
 
     <div className="badge-unlock-card">
