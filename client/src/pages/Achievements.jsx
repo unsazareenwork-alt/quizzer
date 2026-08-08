@@ -127,6 +127,26 @@ useEffect(() => {
   return () => clearTimeout(timer);
 
 }, [unlockQueue]);
+const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const today = new Date();
+
+const startOfWeek = new Date(today);
+const day = startOfWeek.getDay();
+
+const diff = day === 0 ? 6 : day - 1;
+
+startOfWeek.setDate(startOfWeek.getDate() - diff);
+startOfWeek.setHours(0, 0, 0, 0);
+
+const completedDays = history
+  .filter((quiz) => {
+    const quizDate = new Date(quiz.created_at);
+    quizDate.setHours(0, 0, 0, 0);
+
+    return quizDate >= startOfWeek && quizDate <= today;
+  })
+  .map((quiz) => new Date(quiz.created_at).getDay());
   return (
     <>
       <Navbar />
@@ -203,22 +223,36 @@ useEffect(() => {
 
           {/* ================= WEEK STREAK ================= */}
 
-          <div className="week-card">
+          <div className="week-strip">
 
-            <h3>THIS WEEK</h3>
+  {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
 
-            <div className="week-strip">
+    // Convert Monday-first index to JavaScript's Sunday-first day number
+    const dayNumber = index === 6 ? 0 : index + 1;
 
-              {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
-                <div key={index} className="day-card active">
-                  <div className="day-icon"></div>
-                  <span>{day}</span>
-                </div>
-              ))}
+    const isActive = completedDays.includes(dayNumber);
+    const date = new Date(startOfWeek);
+date.setDate(startOfWeek.getDate() + index);
 
-            </div>
+const isToday =
+  date.toDateString() === new Date().toDateString();
 
-          </div>
+    return (
+      <div
+        key={index}
+        className={`day-card ${
+  isActive ? "active" : ""
+} ${isToday ? "today" : ""}`}
+      >
+        <div className="day-icon"></div>
+        <span>{day}</span>
+
+      </div>
+    );
+
+  })}
+
+</div>
 
           {/* ================= BADGES ================= */}
 
